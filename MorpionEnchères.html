@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Morpion à enchères</title>
+<style>
+  :root {
+    --red: #e5484d;
+    --blue: #3b82f6;
+    --green: #22c55e;
+    --purple: #8b5cf6;
+    --orange: #f59e0b;
+    --bg: #0f1115;
+    --panel: #1a1d24;
+    --panel-2: #232732;
+    --text: #e7e9ee;
+    --muted: #8b93a7;
+    --border: #2e3340;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    user-select: none;
+    overflow: hidden;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #app {
+    width: 100%;
+    max-width: 480px;
+    height: 100%;
+    max-height: 900px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    overflow-y: auto;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+  }
+  .screen.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+  .screen.leaving {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  /* ===== Menu ===== */
+  #menu {
+    justify-content: center;
+    align-items: stretch;
+    gap: 24px;
+    padding: 40px 24px;
+  }
+  .logo {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .logo .dots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .logo .dots span {
+    width: 22px; height: 22px; border-radius: 50%;
+  }
+  .logo h1 {
+    margin: 0;
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .logo p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: transform 0.1s, background 0.15s;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    font-size: 1rem;
+  }
+  .menu-btn:active {
+    transform: scale(0.98);
+    background: var(--panel-2);
+  }
+  .menu-btn .icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .menu-btn .text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .menu-btn .title { font-weight: 700; font-size: 15px; }
+  .menu-btn .subtitle { font-size: 12px; color: var(--muted); }
+  .menu-btn .chev {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* ===== Game header ===== */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .topbar .back {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--blue);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 6px 4px;
+    font-family: inherit;
+  }
+  .topbar .mode-label {
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .topbar .refresh {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 6px;
+  }
+
+  /* ===== Settings bar ===== */
+  .settings {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  .segmented {
+    display: inline-flex;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .segmented button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .segmented button.active {
+    background: var(--blue);
+    color: white;
+  }
+
+  /* ===== Player badges ===== */
+  .players {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .badge {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: var(--panel);
+    border: 1.5px solid transparent;
+    min-width: 90px;
+    transition: all 0.2s;
+  }
+  .badge.red.active { border-color: var(--red); background: rgba(229,72,77,0.12); }
+  .badge.blue.active { border-color: var(--blue); background: rgba(59,130,246,0.12); }
+  .badge .row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .badge .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .badge .stock {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .badge.right { text-align: right; }
+  .badge.right .row { justify-content: flex-end; }
+
+  .status {
+    flex: 1;
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .status.red { color: var(--red); }
+  .status.blue { color: var(--blue); }
+  .status.thinking { color: var(--blue); }
+
+  /* ===== Board ===== */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    aspect-ratio: 1;
+    max-width: 380px;
+    width: 100%;
+    margin: 0 auto;
+    flex-shrink: 0;
+  }
+  .cell {
+    position: relative;
+    border-radius: 12px;
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.15s, background 0.15s;
+    overflow: hidden;
+  }
+  .cell.owned-red {
+    background: rgba(229,72,77,0.14);
+    border-color: rgba(229,72,77,0.5);
+  }
+  .cell.owned-blue {
+    background: rgba(59,130,246,0.14);
+    border-color: rgba(59,130,246,0.5);
+  }
+  .cell.selected {
+    border-color: #fff;
+    border-width: 3px;
+    transform: scale(1.02);
+    z-index: 2;
+  }
+  .cell.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .cell:not(.disabled):not(.selected):active {
+    transform: scale(0.96);
+  }
+  .pawn-row {
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+    min-height: 16px;
+    flex-wrap: wrap;
+  }
+  .pawn {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.35);
+    flex-shrink: 0;
+  }
+  .pawn.red { background: var(--red); }
+  .pawn.blue { background: var(--blue); }
+  .pawn-count {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 16px;
+    margin-left: 2px;
+  }
+  .pawn-count.red { color: var(--red); }
+  .pawn-count.blue { color: var(--blue); }
+  .cost-badge {
+    position: absolute;
+    top: 4px; right: 4px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 999px;
+  }
+
+  /* ===== Bottom panel ===== */
+  .bottom {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 0 6px;
+    min-height: 140px;
+  }
+  .panel-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .panel-msg {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .panel-desc {
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+  }
+  .counter button {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.12s;
+    line-height: 1;
+    font-family: inherit;
+  }
+  .counter button:not(:disabled):active { transform: scale(0.92); }
+  .counter button:disabled { opacity: 0.3; cursor: not-allowed; }
+  .counter .value {
+    font-size: 28px;
+    font-weight: 800;
+    min-width: 48px;
+    text-align: center;
+  }
+  .actions {
+    display: flex;
+    gap: 8px;
+  }
+  .actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: transform 0.12s;
+  }
+  .actions button:active { transform: scale(0.97); }
+  .btn-cancel { background: var(--panel-2); color: var(--text); }
+  .btn-confirm { background: var(--red); color: white; }
+  .btn-confirm.blue { background: var(--blue); }
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    background: white;
+    color: #111;
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary:active { transform: scale(0.97); }
+
+  /* ===== Stats footer ===== */
+  .stats-footer {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 4px 0 0;
+  }
+  .stats-footer .item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .stats-footer .val { font-weight: 700; color: var(--text); }
+
+  /* ===== Flying pawn ===== */
+  .flying-pawn {
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.6);
+    pointer-events: none;
+    z-index: 100;
+    transition: left 0.42s cubic-bezier(0.34, 1.3, 0.64, 1),
+                top 0.42s cubic-bezier(0.34, 1.3, 0.64, 1),
+                opacity 0.15s ease 0.35s;
+  }
+
+  /* ===== Stats screen ===== */
+  #stats {
+    justify-content: flex-start;
+    gap: 16px;
+  }
+  #stats h2 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    margin: 8px 0 0;
+  }
+  #stats .sub {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin: -8px 0 8px;
+  }
+  .stat-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    background: var(--panel);
+    border-radius: 12px;
+  }
+  .stat-row .ic {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+    flex-shrink: 0;
+  }
+  .stat-row .lbl { flex: 1; font-weight: 700; }
+  .stat-row .val { font-size: 22px; font-weight: 800; }
+  .winrate {
+    text-align: center;
+    padding: 16px;
+  }
+  .winrate .label { color: var(--muted); font-size: 12px; }
+  .winrate .value { font-size: 32px; font-weight: 800; color: var(--blue); }
+  .reset-btn {
+    padding: 12px;
+    background: var(--panel);
+    color: var(--red);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .reset-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .reset-btn:active { background: var(--panel-2); }
+
+  /* ===== Overlay ===== */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .dialog {
+    background: var(--panel);
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 320px;
+    width: 100%;
+  }
+  .dialog h3 {
+    margin: 0 0 12px;
+    font-size: 16px;
+  }
+  .dialog .btns {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .dialog button {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .dialog .danger { background: var(--red); color: white; }
+  .dialog .secondary { background: var(--panel-2); color: var(--text); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== MENU ===== -->
+  <div class="screen active" id="menu">
+    <div class="logo">
+      <div class="dots">
+        <span style="background:var(--red)"></span>
+        <span style="background:var(--blue)"></span>
+      </div>
+      <h1>Morpion</h1>
+      <p>à enchères</p>
+    </div>
+    <div class="menu-buttons">
+      <button class="menu-btn" data-action="vsAI">
+        <div class="icon" style="background:var(--blue)">🤖</div>
+        <div class="text">
+          <div class="title">Vs IA</div>
+          <div class="subtitle">Joue contre l'ordinateur</div>
+        </div>
+        <div class="chev">›</div>
+      </button>
+      <button class="menu-btn" data-action="vsFriend">
+        <div class="icon" style="background:var(--purple)">👥</div>
+        <div class="text">
+          <div class="title">Vs un ami</div>
+          <div class="subtitle">Deux joueurs sur le même écran</div>
+        </div>
+        <div class="chev">›</div>
+      </button>
+      <button class="menu-btn" data-action="stats">
+        <div class="icon" style="background:var(--orange)">📊</div>
+        <div class="text">
+          <div class="title">Statistiques</div>
+          <div class="subtitle" id="menu-stats-summary">0 V · 0 D · 0 N</div>
+        </div>
+        <div class="chev">›</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== GAME ===== -->
+  <div class="screen" id="game">
+    <div class="topbar">
+      <button class="back" data-action="back">‹ Menu</button>
+      <span class="mode-label" id="game-mode-label">Vs IA</span>
+      <button class="refresh" data-action="reset">↻</button>
+    </div>
+
+    <div class="settings" id="difficulty-bar">
+      <div class="segmented" id="difficulty-picker">
+        <button data-diff="easy">Facile</button>
+        <button data-diff="medium" class="active">Moyen</button>
+        <button data-diff="hard">Difficile</button>
+      </div>
+    </div>
+
+    <div class="players">
+      <div class="badge red" id="badge-red">
+        <div class="row"><span class="dot" style="background:var(--red)"></span><span id="label-red">Rouge</span></div>
+        <div class="stock" id="stock-red">7 pions</div>
+      </div>
+      <div class="status" id="status">Tour du rouge</div>
+      <div class="badge blue right" id="badge-blue">
+        <div class="row"><span id="label-blue">Bleu</span><span class="dot" style="background:var(--blue)"></span></div>
+        <div class="stock" id="stock-blue">7 pions</div>
+      </div>
+    </div>
+
+    <div class="board" id="board"></div>
+
+    <div class="bottom" id="bottom"></div>
+
+    <div class="stats-footer" id="stats-footer"></div>
+  </div>
+
+  <!-- ===== STATS ===== -->
+  <div class="screen" id="stats">
+    <div class="topbar">
+      <button class="back" data-action="back">‹ Menu</button>
+      <span class="mode-label"></span>
+      <span></span>
+    </div>
+    <h2>Statistiques</h2>
+    <p class="sub">Vs IA</p>
+    <div class="stat-row">
+      <div class="ic" style="background:var(--green)">🏆</div>
+      <div class="lbl">Victoires</div>
+      <div class="val" id="stat-wins" style="color:var(--green)">0</div>
+    </div>
+    <div class="stat-row">
+      <div class="ic" style="background:var(--red)">✕</div>
+      <div class="lbl">Défaites</div>
+      <div class="val" id="stat-losses" style="color:var(--red)">0</div>
+    </div>
+    <div class="stat-row">
+      <div class="ic" style="background:var(--muted)">=</div>
+      <div class="lbl">Nulles</div>
+      <div class="val" id="stat-draws" style="color:var(--muted)">0</div>
+    </div>
+    <div class="winrate" id="winrate-block" style="display:none">
+      <div class="label">Taux de victoire</div>
+      <div class="value" id="winrate-value">0 %</div>
+    </div>
+    <div style="flex:1"></div>
+    <button class="reset-btn" id="reset-stats-btn">Réinitialiser les statistiques</button>
+  </div>
+
+  <!-- ===== OVERLAY CONFIRM ===== -->
+  <div class="overlay" id="confirm-overlay">
+    <div class="dialog">
+      <h3 id="confirm-title">Effacer les statistiques ?</h3>
+      <p style="color:var(--muted);font-size:13px;margin:0" id="confirm-text">Cette action est irréversible.</p>
+      <div class="btns">
+        <button class="danger" id="confirm-yes">Tout effacer</button>
+        <button class="secondary" id="confirm-no">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const STARTING_PAWNS = 7;
+
+const LINES = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+
+const DIFFICULTY_DEPTH = { easy: 1, medium: 3, hard: 5 };
+
+// ============================================================
+// STATS (localStorage)
+// ============================================================
+const Stats = {
+  load() {
+    return {
+      wins: parseInt(localStorage.getItem('morpion_wins') || '0'),
+      losses: parseInt(localStorage.getItem('morpion_losses') || '0'),
+      draws: parseInt(localStorage.getItem('morpion_draws') || '0'),
+    };
+  },
+  save(s) {
+    localStorage.setItem('morpion_wins', s.wins);
+    localStorage.setItem('morpion_losses', s.losses);
+    localStorage.setItem('morpion_draws', s.draws);
+  },
+  reset() {
+    this.save({ wins: 0, losses: 0, draws: 0 });
+  }
+};
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let game = null;
+let currentScreen = 'menu';
+
+function newGame(vsAI) {
+  return {
+    board: Array.from({ length: 9 }, () => ({ red: 0, blue: 0 })),
+    current: 'red',
+    stock: { red: STARTING_PAWNS, blue: STARTING_PAWNS },
+    winner: null,
+    isDraw: false,
+    selected: null,
+    pending: 1,
+    vsAI: vsAI,
+    difficulty: 'medium',
+    gameId: Math.random().toString(36),
+    statsRecorded: false,
+  };
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+const other = p => p === 'red' ? 'blue' : 'red';
+const cellCount = (c, p) => p === 'red' ? c.red : c.blue;
+
+function cellOwner(c) {
+  if (c.red > c.blue) return 'red';
+  if (c.blue > c.red) return 'blue';
+  return null;
+}
+
+function minCost(cell, player) {
+  const mine = cellCount(cell, player);
+  const theirs = cellCount(cell, other(player));
+  if (mine > theirs) return 1;
+  return theirs - mine + 1;
+}
+
+function currentStock() {
+  return game.stock[game.current];
+}
+
+function isGameOver() {
+  return game.winner !== null || game.isDraw;
+}
+
+function isAITurn() {
+  return game.vsAI && game.current === 'blue' && !isGameOver();
+}
+
+// ============================================================
+// APPLY MOVE
+// ============================================================
+function applyMove(index, count) {
+  if (isGameOver()) return;
+  const c = game.board[index];
+  const player = game.current;
+  const opp = other(player);
+  const cost = minCost(c, player);
+  if (count < cost || count > game.stock[player]) return;
+
+  // Récupération des pions adverses
+  if (cellOwner(c) === opp) {
+    game.stock[opp] += cellCount(c, opp);
+    if (opp === 'red') c.red = 0; else c.blue = 0;
+  }
+
+  // Pose
+  if (player === 'red') c.red += count; else c.blue += count;
+  game.stock[player] -= count;
+
+  // Victoire ?
+  for (const line of LINES) {
+    const owner = cellOwner(game.board[line[0]]);
+    if (owner && line.every(i => cellOwner(game.board[i]) === owner)) {
+      game.winner = owner;
+      break;
+    }
+  }
+
+  // Tour suivant
+  if (!game.winner) {
+    let next = opp;
+    if (game.stock[next] === 0 && game.stock[player] !== 0) next = player;
+    game.current = next;
+    if (game.stock.red === 0 && game.stock.blue === 0) game.isDraw = true;
+  }
+
+  game.selected = null;
+  game.pending = 1;
+}
+
+// ============================================================
+// IA — MINIMAX avec alpha-bêta
+// ============================================================
+function aiStateFromGame() {
+  return {
+    board: game.board.map(c => ({ ...c })),
+    current: game.current,
+    stock: { ...game.stock }
+  };
+}
+
+function stateWinner(s) {
+  for (const line of LINES) {
+    const o = cellOwner(s.board[line[0]]);
+    if (o && line.every(i => cellOwner(s.board[i]) === o)) return o;
+  }
+  return null;
+}
+
+function legalMoves(s) {
+  const moves = [];
+  const max = s.stock[s.current];
+  if (max <= 0) return moves;
+  for (let i = 0; i < 9; i++) {
+    const c = minCost(s.board[i], s.current);
+    if (c <= max) moves.push({ cell: i, count: c });
+  }
+  return moves;
+}
+
+function applyMoveToState(s, cell, count) {
+  const ns = {
+    board: s.board.map(c => ({ ...c })),
+    current: s.current,
+    stock: { ...s.stock }
+  };
+  const player = s.current;
+  const opp = other(player);
+  const c = ns.board[cell];
+
+  if (cellOwner(c) === opp) {
+    ns.stock[opp] += cellCount(c, opp);
+    if (opp === 'red') c.red = 0; else c.blue = 0;
+  }
+  if (player === 'red') c.red += count; else c.blue += count;
+  ns.stock[player] -= count;
+
+  let next = opp;
+  if (ns.stock[next] === 0 && ns.stock[player] !== 0) next = player;
+  ns.current = next;
+  return ns;
+}
+
+function evaluate(s, player) {
+  const w = stateWinner(s);
+  if (w) return w === player ? 1_000_000 : -1_000_000;
+  if (s.stock.red === 0 && s.stock.blue === 0) return 0;
+
+  const opp = other(player);
+  let score = 0;
+
+  // Stock : crucial
+  score += (s.stock[player] - s.stock[opp]) * 40;
+
+  // Contrôle des cases
+  for (const c of s.board) {
+    const o = cellOwner(c);
+    if (o === player) score += 20;
+    else if (o === opp) score -= 20;
+  }
+
+  // Menaces de lignes (1 case = peu, 2 cases = beaucoup)
+  for (const line of LINES) {
+    let mine = 0, theirs = 0;
+    for (const i of line) {
+      const o = cellOwner(s.board[i]);
+      if (o === player) mine++;
+      else if (o === opp) theirs++;
+    }
+    if (theirs === 0) {
+      if (mine === 2) score += 180;
+      else if (mine === 1) score += 8;
+    }
+    if (mine === 0) {
+      if (theirs === 2) score -= 180;
+      else if (theirs === 1) score -= 8;
+    }
+  }
+
+  // Mobilité
+  if (legalMoves(s).length === 0) {
+    score += (s.current === player) ? -500 : 500;
+  }
+
+  return score;
+}
+
+function minimax(s, depth, alpha, beta, aiPlayer) {
+  const w = stateWinner(s);
+  const isDraw = s.stock.red === 0 && s.stock.blue === 0;
+  if (depth === 0 || w || isDraw) return evaluate(s, aiPlayer);
+
+  const moves = legalMoves(s);
+  if (moves.length === 0) return evaluate(s, aiPlayer);
+
+  const isMax = s.current === aiPlayer;
+
+  if (isMax) {
+    let value = -Infinity;
+    for (const m of moves) {
+      const ns = applyMoveToState(s, m.cell, m.count);
+      value = Math.max(value, minimax(ns, depth - 1, alpha, beta, aiPlayer));
+      alpha = Math.max(alpha, value);
+      if (alpha >= beta) break;
+    }
+    return value;
+  } else {
+    let value = Infinity;
+    for (const m of moves) {
+      const ns = applyMoveToState(s, m.cell, m.count);
+      value = Math.min(value, minimax(ns, depth - 1, alpha, beta, aiPlayer));
+      beta = Math.min(beta, value);
+      if (alpha >= beta) break;
+    }
+    return value;
+  }
+}
+
+function aiChooseMove() {
+  const s = aiStateFromGame();
+  const moves = legalMoves(s);
+  if (moves.length === 0) return null;
+
+  // Facile : 50% aléatoire
+  if (game.difficulty === 'easy' && Math.random() < 0.5) {
+    return moves[Math.floor(Math.random() * moves.length)];
+  }
+
+  const depth = DIFFICULTY_DEPTH[game.difficulty];
+  const aiPlayer = s.current;
+  let bestScore = -Infinity;
+  let bestMoves = [];
+
+  for (const m of moves) {
+    const ns = applyMoveToState(s, m.cell, m.count);
+    const sc = minimax(ns, depth - 1, -Infinity, Infinity, aiPlayer);
+    if (sc > bestScore) {
+      bestScore = sc;
+      bestMoves = [m];
+    } else if (sc === bestScore) {
+      bestMoves.push(m);
+    }
+  }
+  return bestMoves[Math.floor(Math.random() * bestMoves.length)] || moves[0];
+}
+
+// ============================================================
+// ANIMATIONS
+// ============================================================
+function spawnFlyingPawns(index, count, player) {
+  const startEl = document.getElementById('badge-' + player);
+  const cells = document.querySelectorAll('.cell');
+  const endEl = cells[index];
+  if (!startEl || !endEl) return;
+
+  const appRect = document.getElementById('app').getBoundingClientRect();
+  const sRect = startEl.getBoundingClientRect();
+  const eRect = endEl.getBoundingClientRect();
+
+  const sx = sRect.left - appRect.left + sRect.width / 2;
+  const sy = sRect.top - appRect.top + sRect.height / 2;
+  const ex = eRect.left - appRect.left + eRect.width / 2;
+  const ey = eRect.top - appRect.top + eRect.height / 2;
+
+  const visualCount = Math.min(count, 6);
+  for (let i = 0; i < visualCount; i++) {
+    const pawn = document.createElement('div');
+    pawn.className = 'flying-pawn';
+    pawn.style.background = player === 'red' ? 'var(--red)' : 'var(--blue)';
+    pawn.style.left = sx + 'px';
+    pawn.style.top = sy + 'px';
+    document.getElementById('app').appendChild(pawn);
+
+    // Force layout pour que la transition s'applique
+    void pawn.offsetWidth;
+
+    const delay = i * 35;
+    setTimeout(() => {
+      pawn.style.left = ex + 'px';
+      pawn.style.top = ey + 'px';
+      pawn.style.opacity = '0';
+    }, delay);
+
+    setTimeout(() => pawn.remove(), delay + 700);
+  }
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderPawns(count, color) {
+  if (count === 0) {
+    return '<div class="pawn-row"></div>';
+  }
+  if (count <= 4) {
+    let html = '<div class="pawn-row">';
+    for (let i = 0; i < count; i++) {
+      html += `<span class="pawn ${color}"></span>`;
+    }
+    html += '</div>';
+    return html;
+  }
+  return `<div class="pawn-row"><span class="pawn ${color}"></span><span class="pawn-count ${color}">×${count}</span></div>`;
+}
+
+function renderGame() {
+  if (!game) return;
+
+  // Badges
+  document.getElementById('stock-red').textContent =
+    game.stock.red + ' pion' + (game.stock.red > 1 ? 's' : '');
+  document.getElementById('stock-blue').textContent =
+    game.stock.blue + ' pion' + (game.stock.blue > 1 ? 's' : '');
+  document.getElementById('label-red').textContent = 'Rouge';
+  document.getElementById('label-blue').textContent =
+    game.vsAI ? 'IA' : 'Bleu';
+
+  document.getElementById('badge-red').classList.toggle(
+    'active', game.current === 'red' && !isGameOver());
+  document.getElementById('badge-blue').classList.toggle(
+    'active', game.current === 'blue' && !isGameOver());
+
+  // Status
+  const status = document.getElementById('status');
+  status.className = 'status';
+  if (isGameOver()) {
+    if (game.winner) {
+      status.textContent = (game.winner === 'red' ? 'Rouge' : (game.vsAI ? 'IA' : 'Bleu')) + ' gagne !';
+      status.classList.add(game.winner);
+    } else {
+      status.textContent = 'Match nul';
+    }
+  } else if (isAITurn()) {
+    status.textContent = "L'IA réfléchit…";
+    status.classList.add('thinking');
+  } else {
+    status.textContent = 'Tour du ' + (game.current === 'red' ? 'rouge' : (game.vsAI ? 'IA' : 'bleu'));
+    status.classList.add(game.current);
+  }
+
+  // Board
+  const board = document.getElementById('board');
+  let html = '';
+  for (let i = 0; i < 9; i++) {
+    const c = game.board[i];
+    const owner = cellOwner(c);
+    const canPlay = !isGameOver() && !isAITurn() && minCost(c, game.current) <= currentStock();
+    const isSelected = game.selected === i;
+    const cost = minCost(c, game.current);
+
+    let cls = 'cell';
+    if (owner) cls += ' owned-' + owner;
+    if (isSelected) cls += ' selected';
+    if (!canPlay && !isSelected) cls += ' disabled';
+
+    let badge = '';
+    if (!isGameOver() && owner && owner !== game.current && cost > 1 && !isSelected) {
+      badge = `<div class="cost-badge">≥${cost}</div>`;
+    }
+
+    html += `<div class="${cls}" data-index="${i}">
+      ${badge}
+      ${renderPawns(c.red, 'red')}
+      ${renderPawns(c.blue, 'blue')}
+    </div>`;
+  }
+  board.innerHTML = html;
+
+  // Events
+  board.querySelectorAll('.cell').forEach(el => {
+    el.addEventListener('click', () => onCellClick(parseInt(el.dataset.index)));
+  });
+
+  // Bottom panel
+  renderBottomPanel();
+
+  // Stats footer
+  renderStatsFooter();
+}
+
+function renderBottomPanel() {
+  const panel = document.getElementById('bottom');
+  if (isGameOver()) {
+    panel.innerHTML = '<button class="btn-primary" data-action="reset">Nouvelle partie</button>';
+    panel.querySelector('[data-action="reset"]').addEventListener('click', () => resetGame());
+    return;
+  }
+
+  if (isAITurn()) {
+    panel.innerHTML = '<div class="panel-msg">Au tour de l\'IA…</div>';
+    return;
+  }
+
+  if (game.selected === null) {
+    panel.innerHTML = '<div class="panel-msg">Clique une case pour jouer</div>';
+    return;
+  }
+
+  const i = game.selected;
+  const c = game.board[i];
+  const owner = cellOwner(c);
+  const cost = minCost(c, game.current);
+  const max = currentStock();
+
+  let desc;
+  const s = game.pending > 1 ? 's' : '';
+  if (owner === other(game.current)) {
+    desc = `Reprendre la case ${i+1} : ${game.pending} pion${s}. L'adversaire récupère ses pions.`;
+  } else if (owner === game.current) {
+    desc = `Renforcer la case ${i+1} : ${game.pending} pion${s}.`;
+  } else {
+    desc = `Occuper la case ${i+1} : ${game.pending} pion${s}.`;
+  }
+
+  panel.innerHTML = `
+    <div class="panel-content">
+      <div class="panel-desc">${desc}</div>
+      <div class="counter">
+        <button id="btn-minus" ${game.pending <= cost ? 'disabled' : ''}>−</button>
+        <div class="value">${game.pending}</div>
+        <button id="btn-plus" ${game.pending >= max ? 'disabled' : ''}>+</button>
+      </div>
+      <div class="actions">
+        <button class="btn-cancel" id="btn-cancel">Annuler</button>
+        <button class="btn-confirm ${game.current}" id="btn-confirm">Placer</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('btn-minus').addEventListener('click', () => {
+    if (game.pending > cost) { game.pending--; renderGame(); }
+  });
+  document.getElementById('btn-plus').addEventListener('click', () => {
+    if (game.pending < max) { game.pending++; renderGame(); }
+  });
+  document.getElementById('btn-cancel').addEventListener('click', () => {
+    game.selected = null; renderGame();
+  });
+  document.getElementById('btn-confirm').addEventListener('click', () => {
+    performHumanMove(i, game.pending);
+  });
+}
+
+function renderStatsFooter() {
+  const el = document.getElementById('stats-footer');
+  if (!game.vsAI) { el.innerHTML = ''; return; }
+  const s = Stats.load();
+  el.innerHTML = `
+    <span class="item">🏆 <span class="val">${s.wins}</span> victoires</span>
+    <span class="item">✕ <span class="val">${s.losses}</span> défaites</span>
+    <span class="item">= <span class="val">${s.draws}</span> nulles</span>
+  `;
+}
+
+// ============================================================
+// INTERACTIONS
+// ============================================================
+function onCellClick(i) {
+  if (isGameOver() || isAITurn()) return;
+  const cost = minCost(game.board[i], game.current);
+  if (cost > currentStock()) return;
+
+  if (game.selected === i) {
+    game.selected = null;
+  } else {
+    game.selected = i;
+    game.pending = cost;
+  }
+  renderGame();
+}
+
+function performHumanMove(index, count) {
+  if (isGameOver() || isAITurn()) return;
+  const cost = minCost(game.board[index], game.current);
+  if (count < cost || count > currentStock()) return;
+
+  const player = game.current;
+  spawnFlyingPawns(index, count, player);
+  applyMove(index, count);
+  renderGame();
+
+  if (isGameOver()) {
+    recordStatsIfNeeded();
+  } else if (isAITurn()) {
+    setTimeout(runAITurn, 450);
+  }
+}
+
+function runAITurn() {
+  if (!isAITurn()) return;
+  renderGame();
+  setTimeout(() => {
+    const move = aiChooseMove();
+    if (!move) { renderGame(); return; }
+    spawnFlyingPawns(move.cell, move.count, 'blue');
+    applyMove(move.cell, move.count);
+    renderGame();
+    if (isGameOver()) recordStatsIfNeeded();
+  }, 100);
+}
+
+function recordStatsIfNeeded() {
+  if (game.statsRecorded || !game.vsAI) return;
+  game.statsRecorded = true;
+  const s = Stats.load();
+  if (game.winner === 'red') s.wins++;
+  else if (game.winner === 'blue') s.losses++;
+  else if (game.isDraw) s.draws++;
+  Stats.save(s);
+  updateMenuStats();
+}
+
+function resetGame() {
+  const vsAI = game.vsAI;
+  const diff = game.difficulty;
+  game = newGame(vsAI);
+  game.difficulty = diff;
+  renderGame();
+  if (isAITurn()) setTimeout(runAITurn, 400);
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showScreen(name) {
+  const current = document.querySelector('.screen.active');
+  const next = document.getElementById(name);
+  if (!next || current === next) return;
+
+  if (current) {
+    current.classList.remove('active');
+    current.classList.add('leaving');
+    setTimeout(() => current.classList.remove('leaving'), 300);
+  }
+  next.classList.add('active');
+  currentScreen = name;
+
+  if (name === 'menu') updateMenuStats();
+  if (name === 'stats') renderStatsScreen();
+}
+
+function updateMenuStats() {
+  const s = Stats.load();
+  document.getElementById('menu-stats-summary').textContent =
+    `${s.wins} V · ${s.losses} D · ${s.draws} N`;
+}
+
+function renderStatsScreen() {
+  const s = Stats.load();
+  document.getElementById('stat-wins').textContent = s.wins;
+  document.getElementById('stat-losses').textContent = s.losses;
+  document.getElementById('stat-draws').textContent = s.draws;
+  const total = s.wins + s.losses + s.draws;
+  if (total > 0) {
+    document.getElementById('winrate-block').style.display = 'block';
+    document.getElementById('winrate-value').textContent =
+      Math.round((s.wins / total) * 100) + ' %';
+  } else {
+    document.getElementById('winrate-block').style.display = 'none';
+  }
+  document.getElementById('reset-stats-btn').disabled = total === 0;
+}
+
+// ============================================================
+// EVENTS
+// ============================================================
+document.querySelectorAll('.menu-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const action = btn.dataset.action;
+    if (action === 'vsAI') {
+      game = newGame(true);
+      document.getElementById('game-mode-label').textContent = 'Vs IA';
+      document.getElementById('difficulty-bar').style.display = 'flex';
+      document.getElementById('label-blue').textContent = 'IA';
+      updateDifficultyPicker();
+      renderGame();
+      showScreen('game');
+    } else if (action === 'vsFriend') {
+      game = newGame(false);
+      document.getElementById('game-mode-label').textContent = 'Vs un ami';
+      document.getElementById('difficulty-bar').style.display = 'none';
+      document.getElementById('label-blue').textContent = 'Bleu';
+      renderGame();
+      showScreen('game');
+    } else if (action === 'stats') {
+      showScreen('stats');
+    }
+  });
+});
+
+document.querySelectorAll('[data-action="back"]').forEach(btn => {
+  btn.addEventListener('click', () => showScreen('menu'));
+});
+
+document.querySelectorAll('[data-action="reset"]').forEach(btn => {
+  btn.addEventListener('click', () => resetGame());
+});
+
+document.querySelectorAll('#difficulty-picker button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    game.difficulty = btn.dataset.diff;
+    updateDifficultyPicker();
+  });
+});
+
+function updateDifficultyPicker() {
+  document.querySelectorAll('#difficulty-picker button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.diff === game.difficulty);
+  });
+}
+
+// Confirm reset stats
+const confirmOverlay = document.getElementById('confirm-overlay');
+document.getElementById('reset-stats-btn').addEventListener('click', () => {
+  confirmOverlay.classList.add('show');
+});
+document.getElementById('confirm-no').addEventListener('click', () => {
+  confirmOverlay.classList.remove('show');
+});
+document.getElementById('confirm-yes').addEventListener('click', () => {
+  Stats.reset();
+  renderStatsScreen();
+  updateMenuStats();
+  confirmOverlay.classList.remove('show');
+});
+
+// ============================================================
+// INIT
+// ============================================================
+updateMenuStats();
+</script>
+</body>
+</html>
