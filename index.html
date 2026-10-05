@@ -11,6 +11,7 @@
     --green: #22c55e;
     --purple: #8b5cf6;
     --orange: #f59e0b;
+    --yellow: #eab308;
     --bg: #0f1115;
     --panel: #1a1d24;
     --panel-2: #232732;
@@ -29,11 +30,7 @@
     user-select: none;
     overflow: hidden;
   }
-  body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  body { display: flex; align-items: center; justify-content: center; }
   #app {
     width: 100%;
     max-width: 480px;
@@ -61,10 +58,7 @@
     transform: translateX(0);
     pointer-events: auto;
   }
-  .screen.leaving {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
+  .screen.leaving { opacity: 0; transform: translateX(-20px); }
 
   /* ===== Menu ===== */
   #menu {
@@ -81,30 +75,11 @@
     gap: 8px;
     margin-bottom: 20px;
   }
-  .logo .dots {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-  .logo .dots span {
-    width: 22px; height: 22px; border-radius: 50%;
-  }
-  .logo h1 {
-    margin: 0;
-    font-size: 42px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-  }
-  .logo p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 15px;
-  }
-  .menu-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+  .logo .dots { display: flex; gap: 8px; margin-bottom: 8px; }
+  .logo .dots span { width: 22px; height: 22px; border-radius: 50%; }
+  .logo h1 { margin: 0; font-size: 42px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo p { margin: 0; color: var(--muted); font-size: 15px; }
+  .menu-buttons { display: flex; flex-direction: column; gap: 12px; }
   .menu-btn {
     display: flex;
     align-items: center;
@@ -120,69 +95,56 @@
     color: inherit;
     font-size: 1rem;
   }
-  .menu-btn:active {
-    transform: scale(0.98);
-    background: var(--panel-2);
-  }
+  .menu-btn:active { transform: scale(0.98); background: var(--panel-2); }
   .menu-btn .icon {
     width: 46px; height: 46px;
     border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-size: 22px;
     flex-shrink: 0;
   }
-  .menu-btn .text {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
+  .menu-btn .text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
   .menu-btn .title { font-weight: 700; font-size: 15px; }
   .menu-btn .subtitle { font-size: 12px; color: var(--muted); }
-  .menu-btn .chev {
-    color: var(--muted);
-    font-size: 14px;
-  }
+  .menu-btn .chev { color: var(--muted); font-size: 14px; }
 
   /* ===== Game header ===== */
   .topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
   .topbar .back {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
+    display: flex; align-items: center; gap: 4px;
+    background: none; border: none;
     color: var(--blue);
     font-size: 14px;
     cursor: pointer;
     padding: 6px 4px;
     font-family: inherit;
   }
-  .topbar .mode-label {
-    color: var(--muted);
-    font-size: 12px;
-  }
+  .topbar .mode-label { color: var(--muted); font-size: 12px; }
   .topbar .refresh {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 18px;
-    cursor: pointer;
-    padding: 6px;
+    background: none; border: none;
+    color: var(--muted); font-size: 18px;
+    cursor: pointer; padding: 6px;
   }
 
   /* ===== Settings bar ===== */
   .settings {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 10px;
+  }
+  .settings-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: -4px;
   }
   .segmented {
     display: inline-flex;
@@ -204,10 +166,8 @@
     font-family: inherit;
     transition: all 0.15s;
   }
-  .segmented button.active {
-    background: var(--blue);
-    color: white;
-  }
+  .segmented button.active { background: var(--blue); color: white; }
+  .segmented button[data-level="2"].active { background: var(--purple); }
 
   /* ===== Player badges ===== */
   .players {
@@ -231,27 +191,17 @@
   .badge.red.active { border-color: var(--red); background: rgba(229,72,77,0.12); }
   .badge.blue.active { border-color: var(--blue); background: rgba(59,130,246,0.12); }
   .badge .row {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-weight: 700;
-    font-size: 12px;
+    display: flex; align-items: center; gap: 5px;
+    font-weight: 700; font-size: 12px;
   }
-  .badge .dot {
-    width: 10px; height: 10px; border-radius: 50%;
-  }
-  .badge .stock {
-    font-size: 11px;
-    color: var(--muted);
-  }
+  .badge .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .badge .stock { font-size: 11px; color: var(--muted); }
   .badge.right { text-align: right; }
   .badge.right .row { justify-content: flex-end; }
 
   .status {
-    flex: 1;
-    text-align: center;
-    font-weight: 700;
-    font-size: 14px;
+    flex: 1; text-align: center;
+    font-weight: 700; font-size: 14px;
   }
   .status.red { color: var(--red); }
   .status.blue { color: var(--blue); }
@@ -296,13 +246,8 @@
     transform: scale(1.02);
     z-index: 2;
   }
-  .cell.disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-  }
-  .cell:not(.disabled):not(.selected):active {
-    transform: scale(0.96);
-  }
+  .cell.disabled { opacity: 0.35; cursor: not-allowed; }
+  .cell:not(.disabled):not(.selected):active { transform: scale(0.96); }
   .pawn-row {
     display: flex;
     justify-content: center;
@@ -311,7 +256,8 @@
     flex-wrap: wrap;
   }
   .pawn {
-    width: 16px; height: 16px; border-radius: 50%;
+    width: 16px; height: 16px;
+    border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.35);
     flex-shrink: 0;
   }
@@ -334,6 +280,20 @@
     font-weight: 700;
     padding: 2px 6px;
     border-radius: 999px;
+  }
+  .min-badge {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(234,179,8,0.9);
+    color: #1a1a1a;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+    pointer-events: none;
   }
 
   /* ===== Bottom panel ===== */
@@ -391,10 +351,7 @@
     min-width: 48px;
     text-align: center;
   }
-  .actions {
-    display: flex;
-    gap: 8px;
-  }
+  .actions { display: flex; gap: 8px; }
   .actions button {
     flex: 1;
     padding: 12px;
@@ -433,11 +390,7 @@
     color: var(--muted);
     padding: 4px 0 0;
   }
-  .stats-footer .item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
+  .stats-footer .item { display: flex; align-items: center; gap: 4px; }
   .stats-footer .val { font-weight: 700; color: var(--text); }
 
   /* ===== Flying pawn ===== */
@@ -454,10 +407,7 @@
   }
 
   /* ===== Stats screen ===== */
-  #stats {
-    justify-content: flex-start;
-    gap: 16px;
-  }
+  #stats { justify-content: flex-start; gap: 16px; }
   #stats h2 {
     text-align: center;
     font-size: 28px;
@@ -481,19 +431,14 @@
   .stat-row .ic {
     width: 40px; height: 40px;
     border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-size: 18px;
     color: white;
     flex-shrink: 0;
   }
   .stat-row .lbl { flex: 1; font-weight: 700; }
   .stat-row .val { font-size: 22px; font-weight: 800; }
-  .winrate {
-    text-align: center;
-    padding: 16px;
-  }
+  .winrate { text-align: center; padding: 16px; }
   .winrate .label { color: var(--muted); font-size: 12px; }
   .winrate .value { font-size: 32px; font-weight: 800; color: var(--blue); }
   .reset-btn {
@@ -524,10 +469,7 @@
     pointer-events: none;
     transition: opacity 0.2s;
   }
-  .overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
+  .overlay.show { opacity: 1; pointer-events: auto; }
   .dialog {
     background: var(--panel);
     border-radius: 16px;
@@ -535,10 +477,7 @@
     max-width: 320px;
     width: 100%;
   }
-  .dialog h3 {
-    margin: 0 0 12px;
-    font-size: 16px;
-  }
+  .dialog h3 { margin: 0 0 12px; font-size: 16px; }
   .dialog .btns {
     display: flex;
     flex-direction: column;
@@ -607,7 +546,11 @@
       <button class="refresh" data-action="reset">↻</button>
     </div>
 
-    <div class="settings" id="difficulty-bar">
+    <div class="settings">
+      <div class="segmented" id="level-picker">
+        <button data-level="1" class="active">Niveau 1</button>
+        <button data-level="2">Niveau 2</button>
+      </div>
       <div class="segmented" id="difficulty-picker">
         <button data-diff="easy">Facile</button>
         <button data-diff="medium" class="active">Moyen</button>
@@ -682,9 +625,28 @@
 
 <script>
 // ============================================================
-// CONFIG
+// CONFIG — NIVEAUX
 // ============================================================
-const STARTING_PAWNS = 7;
+// Chaque niveau définit :
+//   startingPawns : pions par joueur
+//   minPlacements : { indexCase: pionsMinimum }  (par défaut 1)
+//   name          : nom affiché
+// Index des cases :
+//   0 1 2
+//   3 4 5
+//   6 7 8
+const LEVELS = {
+  1: {
+    name: "Niveau 1",
+    startingPawns: 7,
+    minPlacements: {}
+  },
+  2: {
+    name: "Niveau 2",
+    startingPawns: 9,
+    minPlacements: { 3: 2, 4: 3 }
+  }
+};
 
 const LINES = [
   [0,1,2],[3,4,5],[6,7,8],
@@ -695,7 +657,7 @@ const LINES = [
 const DIFFICULTY_DEPTH = { easy: 1, medium: 3, hard: 5 };
 
 // ============================================================
-// STATS (localStorage)
+// STATS
 // ============================================================
 const Stats = {
   load() {
@@ -710,29 +672,28 @@ const Stats = {
     localStorage.setItem('morpion_losses', s.losses);
     localStorage.setItem('morpion_draws', s.draws);
   },
-  reset() {
-    this.save({ wins: 0, losses: 0, draws: 0 });
-  }
+  reset() { this.save({ wins: 0, losses: 0, draws: 0 }); }
 };
 
 // ============================================================
-// GAME STATE
+// STATE
 // ============================================================
 let game = null;
 let currentScreen = 'menu';
 
-function newGame(vsAI) {
+function newGame(vsAI, level = 1) {
+  const levelCfg = LEVELS[level];
   return {
     board: Array.from({ length: 9 }, () => ({ red: 0, blue: 0 })),
     current: 'red',
-    stock: { red: STARTING_PAWNS, blue: STARTING_PAWNS },
+    stock: { red: levelCfg.startingPawns, blue: levelCfg.startingPawns },
     winner: null,
     isDraw: false,
     selected: null,
     pending: 1,
     vsAI: vsAI,
     difficulty: 'medium',
-    gameId: Math.random().toString(36),
+    level: level,
     statsRecorded: false,
   };
 }
@@ -749,24 +710,31 @@ function cellOwner(c) {
   return null;
 }
 
-function minCost(cell, player) {
+// Coût de base d'une case, sans contrainte de niveau
+function baseCost(cell, player) {
   const mine = cellCount(cell, player);
   const theirs = cellCount(cell, other(player));
   if (mine > theirs) return 1;
   return theirs - mine + 1;
 }
 
-function currentStock() {
-  return game.stock[game.current];
+// Coût minimum réel = max(coût de reprise, minimum du niveau)
+function minCost(index, player, level) {
+  const cell = game.board[index];
+  const base = baseCost(cell, player);
+  const minPlace = LEVELS[level].minPlacements[index] || 1;
+  return Math.max(base, minPlace);
 }
 
-function isGameOver() {
-  return game.winner !== null || game.isDraw;
+// Version IA, sans dépendre de `game`
+function minCostForState(cell, player, minPlace) {
+  const base = baseCost(cell, player);
+  return Math.max(base, minPlace || 1);
 }
 
-function isAITurn() {
-  return game.vsAI && game.current === 'blue' && !isGameOver();
-}
+function currentStock() { return game.stock[game.current]; }
+function isGameOver() { return game.winner !== null || game.isDraw; }
+function isAITurn() { return game.vsAI && game.current === 'blue' && !isGameOver(); }
 
 // ============================================================
 // APPLY MOVE
@@ -776,20 +744,17 @@ function applyMove(index, count) {
   const c = game.board[index];
   const player = game.current;
   const opp = other(player);
-  const cost = minCost(c, player);
+  const cost = minCost(index, player, game.level);
   if (count < cost || count > game.stock[player]) return;
 
-  // Récupération des pions adverses
   if (cellOwner(c) === opp) {
     game.stock[opp] += cellCount(c, opp);
     if (opp === 'red') c.red = 0; else c.blue = 0;
   }
 
-  // Pose
   if (player === 'red') c.red += count; else c.blue += count;
   game.stock[player] -= count;
 
-  // Victoire ?
   for (const line of LINES) {
     const owner = cellOwner(game.board[line[0]]);
     if (owner && line.every(i => cellOwner(game.board[i]) === owner)) {
@@ -798,7 +763,6 @@ function applyMove(index, count) {
     }
   }
 
-  // Tour suivant
   if (!game.winner) {
     let next = opp;
     if (game.stock[next] === 0 && game.stock[player] !== 0) next = player;
@@ -811,13 +775,14 @@ function applyMove(index, count) {
 }
 
 // ============================================================
-// IA — MINIMAX avec alpha-bêta
+// IA
 // ============================================================
 function aiStateFromGame() {
   return {
     board: game.board.map(c => ({ ...c })),
     current: game.current,
-    stock: { ...game.stock }
+    stock: { ...game.stock },
+    level: game.level
   };
 }
 
@@ -833,8 +798,9 @@ function legalMoves(s) {
   const moves = [];
   const max = s.stock[s.current];
   if (max <= 0) return moves;
+  const constraints = LEVELS[s.level].minPlacements;
   for (let i = 0; i < 9; i++) {
-    const c = minCost(s.board[i], s.current);
+    const c = minCostForState(s.board[i], s.current, constraints[i]);
     if (c <= max) moves.push({ cell: i, count: c });
   }
   return moves;
@@ -844,7 +810,8 @@ function applyMoveToState(s, cell, count) {
   const ns = {
     board: s.board.map(c => ({ ...c })),
     current: s.current,
-    stock: { ...s.stock }
+    stock: { ...s.stock },
+    level: s.level
   };
   const player = s.current;
   const opp = other(player);
@@ -871,17 +838,14 @@ function evaluate(s, player) {
   const opp = other(player);
   let score = 0;
 
-  // Stock : crucial
   score += (s.stock[player] - s.stock[opp]) * 40;
 
-  // Contrôle des cases
   for (const c of s.board) {
     const o = cellOwner(c);
     if (o === player) score += 20;
     else if (o === opp) score -= 20;
   }
 
-  // Menaces de lignes (1 case = peu, 2 cases = beaucoup)
   for (const line of LINES) {
     let mine = 0, theirs = 0;
     for (const i of line) {
@@ -899,7 +863,6 @@ function evaluate(s, player) {
     }
   }
 
-  // Mobilité
   if (legalMoves(s).length === 0) {
     score += (s.current === player) ? -500 : 500;
   }
@@ -943,7 +906,6 @@ function aiChooseMove() {
   const moves = legalMoves(s);
   if (moves.length === 0) return null;
 
-  // Facile : 50% aléatoire
   if (game.difficulty === 'easy' && Math.random() < 0.5) {
     return moves[Math.floor(Math.random() * moves.length)];
   }
@@ -992,8 +954,6 @@ function spawnFlyingPawns(index, count, player) {
     pawn.style.left = sx + 'px';
     pawn.style.top = sy + 'px';
     document.getElementById('app').appendChild(pawn);
-
-    // Force layout pour que la transition s'applique
     void pawn.offsetWidth;
 
     const delay = i * 35;
@@ -1002,7 +962,6 @@ function spawnFlyingPawns(index, count, player) {
       pawn.style.top = ey + 'px';
       pawn.style.opacity = '0';
     }, delay);
-
     setTimeout(() => pawn.remove(), delay + 700);
   }
 }
@@ -1011,14 +970,10 @@ function spawnFlyingPawns(index, count, player) {
 // RENDER
 // ============================================================
 function renderPawns(count, color) {
-  if (count === 0) {
-    return '<div class="pawn-row"></div>';
-  }
+  if (count === 0) return '<div class="pawn-row"></div>';
   if (count <= 4) {
     let html = '<div class="pawn-row">';
-    for (let i = 0; i < count; i++) {
-      html += `<span class="pawn ${color}"></span>`;
-    }
+    for (let i = 0; i < count; i++) html += `<span class="pawn ${color}"></span>`;
     html += '</div>';
     return html;
   }
@@ -1028,21 +983,18 @@ function renderPawns(count, color) {
 function renderGame() {
   if (!game) return;
 
-  // Badges
   document.getElementById('stock-red').textContent =
     game.stock.red + ' pion' + (game.stock.red > 1 ? 's' : '');
   document.getElementById('stock-blue').textContent =
     game.stock.blue + ' pion' + (game.stock.blue > 1 ? 's' : '');
   document.getElementById('label-red').textContent = 'Rouge';
-  document.getElementById('label-blue').textContent =
-    game.vsAI ? 'IA' : 'Bleu';
+  document.getElementById('label-blue').textContent = game.vsAI ? 'IA' : 'Bleu';
 
   document.getElementById('badge-red').classList.toggle(
     'active', game.current === 'red' && !isGameOver());
   document.getElementById('badge-blue').classList.toggle(
     'active', game.current === 'blue' && !isGameOver());
 
-  // Status
   const status = document.getElementById('status');
   status.className = 'status';
   if (isGameOver()) {
@@ -1060,43 +1012,47 @@ function renderGame() {
     status.classList.add(game.current);
   }
 
-  // Board
   const board = document.getElementById('board');
+  const constraints = LEVELS[game.level].minPlacements;
   let html = '';
   for (let i = 0; i < 9; i++) {
     const c = game.board[i];
     const owner = cellOwner(c);
-    const canPlay = !isGameOver() && !isAITurn() && minCost(c, game.current) <= currentStock();
+    const cost = minCost(i, game.current, game.level);
+    const canPlay = !isGameOver() && !isAITurn() && cost <= currentStock();
     const isSelected = game.selected === i;
-    const cost = minCost(c, game.current);
 
     let cls = 'cell';
     if (owner) cls += ' owned-' + owner;
     if (isSelected) cls += ' selected';
     if (!canPlay && !isSelected) cls += ' disabled';
 
-    let badge = '';
+    // Badge de coût sur cases adverses
+    let costBadge = '';
     if (!isGameOver() && owner && owner !== game.current && cost > 1 && !isSelected) {
-      badge = `<div class="cost-badge">≥${cost}</div>`;
+      costBadge = `<div class="cost-badge">≥${cost}</div>`;
+    }
+
+    // Badge "min N" sur les cases contraintes du niveau
+    let minBadge = '';
+    if (constraints[i]) {
+      minBadge = `<div class="min-badge">MIN ${constraints[i]}</div>`;
     }
 
     html += `<div class="${cls}" data-index="${i}">
-      ${badge}
+      ${costBadge}
+      ${minBadge}
       ${renderPawns(c.red, 'red')}
       ${renderPawns(c.blue, 'blue')}
     </div>`;
   }
   board.innerHTML = html;
 
-  // Events
   board.querySelectorAll('.cell').forEach(el => {
     el.addEventListener('click', () => onCellClick(parseInt(el.dataset.index)));
   });
 
-  // Bottom panel
   renderBottomPanel();
-
-  // Stats footer
   renderStatsFooter();
 }
 
@@ -1121,8 +1077,9 @@ function renderBottomPanel() {
   const i = game.selected;
   const c = game.board[i];
   const owner = cellOwner(c);
-  const cost = minCost(c, game.current);
+  const cost = minCost(i, game.current, game.level);
   const max = currentStock();
+  const minPlacement = LEVELS[game.level].minPlacements[i];
 
   let desc;
   const s = game.pending > 1 ? 's' : '';
@@ -1132,6 +1089,9 @@ function renderBottomPanel() {
     desc = `Renforcer la case ${i+1} : ${game.pending} pion${s}.`;
   } else {
     desc = `Occuper la case ${i+1} : ${game.pending} pion${s}.`;
+  }
+  if (minPlacement && game.pending === minPlacement && minPlacement > baseCost(c, game.current)) {
+    desc += ` (minimum ${minPlacement} sur cette case)`;
   }
 
   panel.innerHTML = `
@@ -1179,7 +1139,7 @@ function renderStatsFooter() {
 // ============================================================
 function onCellClick(i) {
   if (isGameOver() || isAITurn()) return;
-  const cost = minCost(game.board[i], game.current);
+  const cost = minCost(i, game.current, game.level);
   if (cost > currentStock()) return;
 
   if (game.selected === i) {
@@ -1193,7 +1153,7 @@ function onCellClick(i) {
 
 function performHumanMove(index, count) {
   if (isGameOver() || isAITurn()) return;
-  const cost = minCost(game.board[index], game.current);
+  const cost = minCost(index, game.current, game.level);
   if (count < cost || count > currentStock()) return;
 
   const player = game.current;
@@ -1235,7 +1195,8 @@ function recordStatsIfNeeded() {
 function resetGame() {
   const vsAI = game.vsAI;
   const diff = game.difficulty;
-  game = newGame(vsAI);
+  const level = game.level;
+  game = newGame(vsAI, level);
   game.difficulty = diff;
   renderGame();
   if (isAITurn()) setTimeout(runAITurn, 400);
@@ -1290,18 +1251,18 @@ document.querySelectorAll('.menu-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const action = btn.dataset.action;
     if (action === 'vsAI') {
-      game = newGame(true);
+      game = newGame(true, 1);
       document.getElementById('game-mode-label').textContent = 'Vs IA';
-      document.getElementById('difficulty-bar').style.display = 'flex';
-      document.getElementById('label-blue').textContent = 'IA';
+      document.getElementById('difficulty-picker').style.display = 'inline-flex';
+      updateLevelPicker();
       updateDifficultyPicker();
       renderGame();
       showScreen('game');
     } else if (action === 'vsFriend') {
-      game = newGame(false);
+      game = newGame(false, 1);
       document.getElementById('game-mode-label').textContent = 'Vs un ami';
-      document.getElementById('difficulty-bar').style.display = 'none';
-      document.getElementById('label-blue').textContent = 'Bleu';
+      document.getElementById('difficulty-picker').style.display = 'none';
+      updateLevelPicker();
       renderGame();
       showScreen('game');
     } else if (action === 'stats') {
@@ -1325,9 +1286,27 @@ document.querySelectorAll('#difficulty-picker button').forEach(btn => {
   });
 });
 
+document.querySelectorAll('#level-picker button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const level = parseInt(btn.dataset.level);
+    if (level === game.level) return;
+    // Changer de niveau relance la partie (les pions et contraintes changent)
+    game.level = level;
+    game = newGame(game.vsAI, level);
+    updateLevelPicker();
+    renderGame();
+  });
+});
+
 function updateDifficultyPicker() {
   document.querySelectorAll('#difficulty-picker button').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.diff === game.difficulty);
+  });
+}
+
+function updateLevelPicker() {
+  document.querySelectorAll('#level-picker button').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.level) === game.level);
   });
 }
 
